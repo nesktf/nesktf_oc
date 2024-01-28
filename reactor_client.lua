@@ -13,6 +13,8 @@ local gpu = component.gpu
 local modem = component.modem
 
 -- Consts
+DISTILL_MIN   = 100000
+IC2_COOL_MIN  = 50000
 LSC_MAX_RATIO = 0.8
 LSC_MIN_RATIO = 0.2
 RESTOCK_DELAY = 10
@@ -78,7 +80,7 @@ local state = {
       name    = "IC2 Coolant",
       amount  = 0,
       side    = -1,
-      min     = 50000,
+      min     = IC2_COOL_MIN,
       status  = STATUS_FLUID_LESSMIN,
     },
     [FLUID_HOT] = {
@@ -92,7 +94,7 @@ local state = {
       name    = "Distilled water",
       amount = 0,
       side    = sides.up,
-      min     = 100000,
+      min     = DISTILL_MIN,
       status  = STATUS_FLUID_LESSMIN,
     }
   },
