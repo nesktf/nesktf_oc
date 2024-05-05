@@ -29,8 +29,8 @@ local function parseLSC(sensor)
     return string.gsub(str, "(last 5 seconds)","")
   end
 
-  local stored = parse_fuzzy_int(sensor[2])
-  local max = parse_fuzzy_int(sensor[3])
+  local stored = parse_fuzzy_int(string.gsub(sensor[2], "EU stored (exact):", ""))
+  local max = parse_fuzzy_int(string.gsub(sensor[5], "Total Capacity (exact):", ""))
 
   local data = {
     [LSC_STORED]  = stored,
