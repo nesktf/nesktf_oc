@@ -7,9 +7,7 @@ local lsc = component.gt_machine
 local modem = component.modem
 local serialize = serialization.serialize
 
--- Consts
-PORT = 123
-SLEEP_SECS = 1
+local config = require("fluid_nuke.config")
 
 -- Enums
 LSC_STORED    = 6
@@ -59,7 +57,7 @@ local function printData(data)
 end
 
 local function main()
-  modem.open(PORT)
+  modem.open(config.port)
   local keep_alive = true
   event.listen("interrupted", function() keep_alive = false end)
 
@@ -69,7 +67,7 @@ local function main()
 
     printData(data)
     modem.broadcast(PORT, serialize(data))
-    os.sleep(SLEEP_SECS)
+    os.sleep(config.client_sleep)
   end
 
   term.clear()

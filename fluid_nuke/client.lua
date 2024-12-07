@@ -1,7 +1,3 @@
--- STEAM VALUES:
--- 4480
--- 4800
-
 local sides = require("sides")
 local component = require("component")
 local term = require("term")
@@ -12,14 +8,7 @@ local serialization = require("serialization")
 local gpu = component.gpu
 local modem = component.modem
 
--- Consts
-DISTILL_MIN   = 100000
-IC2_COOL_MIN  = 50000
-LSC_MAX_RATIO = 0.8
-LSC_MIN_RATIO = 0.2
-RESTOCK_DELAY = 10
-PORT          = 123
-SLEEP_TIME    = 0.5
+local config = require("fluid_nuke.config")
 
 -- Screen size
 WIDTH, HEIGHT = gpu.getResolution()
@@ -80,7 +69,7 @@ local state = {
       name    = "IC2 Coolant",
       amount  = 0,
       side    = -1,
-      min     = IC2_COOL_MIN,
+      min     = config.min_coolant,
       status  = STATUS_FLUID_LESSMIN,
     },
     [FLUID_HOT] = {
@@ -94,7 +83,7 @@ local state = {
       name    = "Distilled water",
       amount = 0,
       side    = sides.up,
-      min     = DISTILL_MIN,
+      min     = config.min_distill,
       status  = STATUS_FLUID_LESSMIN,
     }
   },
@@ -502,7 +491,7 @@ local widgets = {
 local daemon = {
   run_cycles = 0,
   [DAEMON_STATE_IDLE] = function (this)
-    if (state.lsc[LSC_RATIO] < LSC_MIN_RATIO) then
+    if (state.lsc[LSC_RATIO] < config.min_lsc_ratio) then
       state.message = "Reactor operating"
       reactor.start(reactor) -- Implicit change to DAEMON_STATE_RUNNING
     end
@@ -517,7 +506,7 @@ local daemon = {
       return
     end
 
-    if (state.lsc[LSC_RATIO] > LSC_MAX_RATIO) then
+    if (state.lsc[LSC_RATIO] > config.max_lsc_ratio) then
       reactor.stop(reactor)
       this.run_cycles = 0
       DAEMON_STATE = DAEMON_STATE_IDLE
@@ -525,7 +514,7 @@ local daemon = {
       return
     end
 
-    if (this.run_cycles > (RESTOCK_DELAY-1)) then
+    if (this.run_cycles > (config.restock_delay-1)) then
       reactor.restock(reactor)
       this.run_cycles = 0
     end
@@ -574,13 +563,13 @@ local function main()
       end
       daemon[DAEMON_STATE](daemon)
 
-      os.sleep(SLEEP_TIME)
+      os.sleep(config.server_sleep)
     end
     term.clear()
     print("Script interrupted")
   end
 
-  modem.open(PORT)
+  modem.open(config.port)
   local status, err = pcall(guardedMain)
   if not status then
     reactor.stop(reactor)
