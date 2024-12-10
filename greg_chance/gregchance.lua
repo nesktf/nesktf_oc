@@ -49,10 +49,12 @@ local args, _ = shell.parse(...)
 
 -- $ gregchance 20 64 0.05
 local total = tostacks(args[1])
-local req = args[2]
-local prob = args[3]
+assert(type(total) == "number")
 
-print(string.format([[
-Probability of getting %d things by processing %d stacks
-of objects at a %.2f% chance per each object:
-- %s]]), req, total, prob*100, greg_chance(total, req, prob))
+local req = args[2]
+assert(type(req) == "number")
+
+local prob = args[3]
+assert(type(prob) == "number")
+
+print(greg_chance(total, req, prob))
